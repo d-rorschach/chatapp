@@ -2,7 +2,13 @@ import { FormControl } from "@chakra-ui/form-control";
 import { Input } from "@chakra-ui/input";
 import { Box, Text } from "@chakra-ui/layout";
 import "./styles.css";
-import { IconButton, Spinner, useToast } from "@chakra-ui/react";
+import {
+  IconButton,
+  Spinner,
+  useToast,
+  Button,
+  ButtonGroup,
+} from "@chakra-ui/react";
 import { getSender, getSenderFull } from "../config/ChatLogics";
 import { useEffect, useState } from "react";
 import axios from "axios";
@@ -13,7 +19,6 @@ import Lottie from "react-lottie";
 import animationData from "../animations/typing.json";
 
 import io from "socket.io-client";
-import UpdateGroupChatModal from "./miscellaneous/UpdateGroupChatModal";
 import { ChatState } from "../Context/ChatProvider";
 const ENDPOINT = "http://localhost:8080"; // "https://talk-a-tive.herokuapp.com"; -> After deployment
 var socket, selectedChatCompare;
@@ -22,6 +27,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
   const [newMessage, setNewMessage] = useState("");
+  const [gptPrompt, setGptPrompt] = useState("");
   const [socketConnected, setSocketConnected] = useState(false);
   const [typing, setTyping] = useState(false);
   const [istyping, setIsTyping] = useState(false);
@@ -68,6 +74,24 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
         position: "bottom",
       });
     }
+  };
+
+  const handleChatSuggestion = async (e) => {
+    e.preventDefault(); // Prevent page refresh
+    const config = {
+      headers: {
+        "Content-type": "application/json",
+        Authorization: `Bearer ${user.token}`,
+      },
+    };
+    await axios.post(
+      "/api/ai/get/chat/suggestion",
+      {
+        chatId: selectedChat._id,
+        prompt: gptPrompt,
+      },
+      config
+    );
   };
 
   const sendMessage = async (event) => {
@@ -137,6 +161,10 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
     });
   });
 
+  const handlePromptChange = (e) => {
+    setGptPrompt(e.target.value);
+  };
+
   const typingHandler = (e) => {
     setNewMessage(e.target.value);
 
@@ -188,11 +216,11 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
               ) : (
                 <>
                   {selectedChat.chatName.toUpperCase()}
-                  <UpdateGroupChatModal
+                  {/* <UpdateGroupChatModal
                     fetchMessages={fetchMessages}
                     fetchAgain={fetchAgain}
                     setFetchAgain={setFetchAgain}
-                  />
+                  /> */}
                 </>
               ))}
           </Text>
@@ -247,6 +275,21 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
                 onChange={typingHandler}
               />
             </FormControl>
+
+            <form onSubmit={handleChatSuggestion}>
+              <FormControl id="chat-suggestion" mt={3} isRequired>
+                <Input
+                  variant="filled"
+                  bg="#E0E0E0"
+                  placeholder="Enter your suggestion..."
+                  value={gptPrompt}
+                  onChange={handlePromptChange}
+                />
+                <Button type="submit" mt={3} colorScheme="blue">
+                  Submit Suggestion
+                </Button>
+              </FormControl>
+            </form>
           </Box>
         </>
       ) : (
