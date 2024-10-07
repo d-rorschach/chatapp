@@ -23,7 +23,7 @@ const MyChats = ({ fetchAgain }) => {
           Authorization: `Bearer ${user.token}`,
         },
       };
-
+      console.log("fetch chat user info: ", user);
       const { data } = await axios.get("/api/chat", config);
       setChats(data);
     } catch (error) {
