@@ -1,5 +1,5 @@
 // Import the OpenAI package
-const { OpenAI } = require("openai");
+const openai = require("./openaiClient");
 
 // Function to list available models
 async function listModels() {
@@ -18,10 +18,6 @@ async function listModels() {
 // Function to analyze a conversation using OpenAI's GPT-3.5 Turbo
 async function analyzeConversation(prompt, conversationText) {
   try {
-    const openai = new OpenAI({
-      apiKey: process.env.OPENAI_API_KEY,
-    });
-
     const gptInput = `
       ${prompt}
       Conversation:
@@ -44,10 +40,6 @@ async function analyzeConversation(prompt, conversationText) {
 
 async function getChatSuggestion(prompt, conversationText) {
   try {
-    const openai = new OpenAI({
-      apiKey: process.env.OPENAI_API_KEY,
-    });
-
     const gptInput = `
       ${prompt}
       Conversation:
