@@ -16,24 +16,27 @@ async function listModels() {
 }
 
 // Function to analyze a conversation using OpenAI's GPT-3.5 Turbo
-async function analyzeConversation(conversationText) {
+async function analyzeConversation(prompt, conversationText) {
   try {
-    const prompt = `
-      As a dating coach, analyze the following conversation between the user and their match. Identify strengths, weaknesses, and provide suggestions for improvement.
+    const openai = new OpenAI({
+      apiKey: process.env.OPENAI_API_KEY,
+    });
 
+    const gptInput = `
+      ${prompt}
       Conversation:
       ${conversationText}
 
       Analysis:
     `;
 
-    const response = await openai.createChatCompletion({
+    const response = await openai.chat.completions.create({
       model: "gpt-3.5-turbo",
-      messages: [{ role: "user", content: prompt }],
+      messages: [{ role: "user", content: gptInput }],
     });
 
     // Return the response content
-    return response.data.choices[0].message.content;
+    return response.choices[0].message.content;
   } catch (error) {
     console.error("Error analyzing conversation:", error);
   }
@@ -41,30 +44,29 @@ async function analyzeConversation(conversationText) {
 
 async function getChatSuggestion(prompt, conversationText) {
   try {
-    // const openai = new OpenAI({
-    // apiKey: process.env.OPENAI_API_KEY,
-    // });
+    const openai = new OpenAI({
+      apiKey: process.env.OPENAI_API_KEY,
+    });
 
-    const oldPrompt = `
-      As a dating coach, analyze the following conversation between the user and their match. Tell me what is the next possible intersting chat suggestion. give me a crisp intersting response.
-
+    const gptInput = `
+      ${prompt}
       Conversation:
       ${conversationText}
-
-      Analysis:
     `;
 
-    // const response = await openai.chat.completions.create({
-    //   model: "gpt-3.5-turbo",
-    //   messages: [{ role: "user", content: prompt }],
-    // });
+    const response = await openai.chat.completions.create({
+      model: "gpt-3.5-turbo",
+      messages: [{ role: "user", content: gptInput }],
+    });
 
     // Return the response content
-    // return response.choices[0].message.content;
-    return prompt;
+    return response.choices[0].message.content;
   } catch (error) {
     console.error("Error analyzing conversation:", error);
   }
 }
 
-module.exports = { getChatSuggestion };
+module.exports = {
+  getChatSuggestion,
+  analyzeConversation,
+};

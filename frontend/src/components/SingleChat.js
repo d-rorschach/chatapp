@@ -27,7 +27,12 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
   const [newMessage, setNewMessage] = useState("");
-  const [gptPrompt, setGptPrompt] = useState("");
+  const [suggestChatPrompt, setSuggestChatPrompt] = useState(
+    "As a dating coach, suggest a next possible intersting chat, between the user and their match. give me a crisp intersting chat as response only."
+  );
+  const [analyzeChatPrompt, setAnalyzeChatPrompt] = useState(
+    "As a dating coach, analyze the following conversation between the user and their match. Identify strengths, weaknesses, and provide suggestions for improvement."
+  );
   const [socketConnected, setSocketConnected] = useState(false);
   const [typing, setTyping] = useState(false);
   const [istyping, setIsTyping] = useState(false);
@@ -77,21 +82,68 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
   };
 
   const handleChatSuggestion = async (e) => {
-    e.preventDefault(); // Prevent page refresh
-    const config = {
-      headers: {
-        "Content-type": "application/json",
-        Authorization: `Bearer ${user.token}`,
-      },
-    };
-    await axios.post(
-      "/api/ai/get/chat/suggestion",
-      {
-        chatId: selectedChat._id,
-        prompt: gptPrompt,
-      },
-      config
-    );
+    try {
+      e.preventDefault(); // Prevent page refresh
+      const config = {
+        headers: {
+          "Content-type": "application/json",
+          Authorization: `Bearer ${user.token}`,
+        },
+      };
+      const aiChatSuggestionResponse = await axios.post(
+        "/api/ai/get/chat/suggestion",
+        {
+          chatId: selectedChat._id,
+          prompt: suggestChatPrompt,
+        },
+        config
+      );
+      setNewMessage(aiChatSuggestionResponse.data);
+    } catch (error) {
+      toast({
+        title: "Error Occured!",
+        description: "Failed to send the Message to ai",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+        position: "bottom",
+      });
+    }
+  };
+  const handleAnalyzeChat = async (e) => {
+    try {
+      e.preventDefault(); // Prevent page refresh
+      const config = {
+        headers: {
+          "Content-type": "application/json",
+          Authorization: `Bearer ${user.token}`,
+        },
+      };
+      const aiChatAnalyzeResponse = await axios.post(
+        "/api/ai/get/chat/analyze",
+        {
+          chatId: selectedChat._id,
+          prompt: analyzeChatPrompt,
+        },
+        config
+      );
+      toast({
+        title: "Chat analyzed successfully!",
+        description: aiChatAnalyzeResponse.data,
+        status: "success",
+        duration: 5000,
+        isClosable: true,
+      });
+    } catch (error) {
+      toast({
+        title: "Error Occured!",
+        description: "Failed to send the Message to ai",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+        position: "bottom",
+      });
+    }
   };
 
   const sendMessage = async (event) => {
@@ -161,8 +213,12 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
     });
   });
 
-  const handlePromptChange = (e) => {
-    setGptPrompt(e.target.value);
+  const handleSuggestionPromptChange = (e) => {
+    setSuggestChatPrompt(e.target.value);
+  };
+
+  const handleAnalyzePromptChange = (e) => {
+    setAnalyzeChatPrompt(e.target.value);
   };
 
   const typingHandler = (e) => {
@@ -277,16 +333,45 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
             </FormControl>
 
             <form onSubmit={handleChatSuggestion}>
-              <FormControl id="chat-suggestion" mt={3} isRequired>
+              <FormControl
+                id="chat-suggestion"
+                mt={3}
+                isRequired
+                display="flex"
+                alignItems="center"
+              >
                 <Input
                   variant="filled"
                   bg="#E0E0E0"
-                  placeholder="Enter your suggestion..."
-                  value={gptPrompt}
-                  onChange={handlePromptChange}
+                  value={suggestChatPrompt}
+                  onChange={handleSuggestionPromptChange}
+                  flex="1" // Make input take remaining width
+                  mr={2} // Add some margin between the input and button
                 />
-                <Button type="submit" mt={3} colorScheme="blue">
+                <Button type="submit" mt={0} colorScheme="blue">
                   Submit Suggestion
+                </Button>
+              </FormControl>
+            </form>
+
+            <form onSubmit={handleAnalyzeChat}>
+              <FormControl
+                id="chat-suggestion"
+                mt={3}
+                isRequired
+                display="flex"
+                alignItems="center"
+              >
+                <Input
+                  variant="filled"
+                  bg="#E0E0E0"
+                  value={analyzeChatPrompt}
+                  onChange={handleAnalyzePromptChange}
+                  flex="1" // Make input take remaining width
+                  mr={2} // Add some margin between the input and button
+                />
+                <Button type="submit" mt={0} colorScheme="blue">
+                  Analyze Chat
                 </Button>
               </FormControl>
             </form>
