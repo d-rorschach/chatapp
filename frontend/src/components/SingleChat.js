@@ -31,7 +31,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
     "As a dating coach, suggest a next possible intersting chat, between the user and their match. give me a crisp intersting chat as response only."
   );
   const [analyzeChatPrompt, setAnalyzeChatPrompt] = useState(
-    "As a dating coach, analyze the following conversation between the user and their match. Identify strengths, weaknesses, and provide suggestions for improvement."
+    "As a dating coach, analyze the following conversation between the user and their match. Identify strengths, weaknesses, and provide suggestions for improvement in very brief."
   );
   const [socketConnected, setSocketConnected] = useState(false);
   const [typing, setTyping] = useState(false);
