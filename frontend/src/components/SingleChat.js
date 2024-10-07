@@ -131,7 +131,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
         title: "Chat analyzed successfully!",
         description: aiChatAnalyzeResponse.data,
         status: "success",
-        duration: 5000,
+        duration: null,
         isClosable: true,
       });
     } catch (error) {
