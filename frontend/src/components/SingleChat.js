@@ -151,6 +151,41 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
     }
   };
 
+  const handleAiTip = async (e) => {
+    try {
+      e.preventDefault(); // Prevent page refresh
+      const config = {
+        headers: {
+          "Content-type": "application/json",
+          Authorization: `Bearer ${user.token}`,
+        },
+      };
+      const aiTipResponse = await axios.post(
+        "/api/ai/get/chat/tip",
+        {
+          prompt: aiTipPrompt,
+        },
+        config
+      );
+      toast({
+        title: "Ai Tip!",
+        description: aiTipResponse.data,
+        status: "success",
+        duration: null,
+        isClosable: true,
+      });
+    } catch (error) {
+      toast({
+        title: "Error Occured!",
+        description: "Failed to send the Message to ai",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+        position: "bottom",
+      });
+    }
+  };
+
   const sendMessage = async (event) => {
     if (event.key === "Enter" && newMessage) {
       socket.emit("stop typing", selectedChat._id);
