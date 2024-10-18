@@ -58,7 +58,26 @@ async function getChatSuggestion(prompt, conversationText) {
   }
 }
 
+async function getAiTip(prompt) {
+  try {
+    const gptInput = `
+      ${prompt}
+    `;
+
+    const response = await openai.chat.completions.create({
+      model: "gpt-3.5-turbo",
+      messages: [{ role: "user", content: gptInput }],
+    });
+
+    // Return the response content
+    return response.choices[0].message.content;
+  } catch (error) {
+    console.error("Error analyzing conversation:", error);
+  }
+}
+
 module.exports = {
   getChatSuggestion,
   analyzeConversation,
+  getAiTip,
 };

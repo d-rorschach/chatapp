@@ -28,10 +28,13 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
   const [loading, setLoading] = useState(false);
   const [newMessage, setNewMessage] = useState("");
   const [suggestChatPrompt, setSuggestChatPrompt] = useState(
-    "As a dating coach, suggest a next possible intersting chat, between the user and their match. give me a crisp intersting chat as response only."
+    "As a dating coach, suggest ONLY my next possible interesting message to send in an ongoing conversation with my match. The last message in the conversation is indicated by either 'Match:' or 'Me:'. Generate a response only for me and do not invent or respond on behalf of my match. Don't attach any 'Me:' at the beginning"
   );
   const [analyzeChatPrompt, setAnalyzeChatPrompt] = useState(
     "As a dating coach, analyze the following conversation between the user and their match. Identify strengths, weaknesses, and provide suggestions for improvement in very brief."
+  );
+  const [aiTipPrompt, setAiTipPrompt] = useState(
+    "As a dating coach, Give me a Tip/Next Chat Suggestion in this situation in brief:"
   );
   const [socketConnected, setSocketConnected] = useState(false);
   const [typing, setTyping] = useState(false);
@@ -95,6 +98,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
         {
           chatId: selectedChat._id,
           prompt: suggestChatPrompt,
+          userId: user._id,
         },
         config
       );
@@ -124,6 +128,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
         {
           chatId: selectedChat._id,
           prompt: analyzeChatPrompt,
+          userId: user._id,
         },
         config
       );
@@ -219,6 +224,10 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
 
   const handleAnalyzePromptChange = (e) => {
     setAnalyzeChatPrompt(e.target.value);
+  };
+
+  const handleAiTipPromptChange = (e) => {
+    setAiTipPrompt(e.target.value);
   };
 
   const typingHandler = (e) => {
@@ -372,6 +381,28 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
                 />
                 <Button type="submit" mt={0} colorScheme="blue">
                   Analyze Chat
+                </Button>
+              </FormControl>
+            </form>
+
+            <form onSubmit={handleAiTip}>
+              <FormControl
+                id="chat-suggestion"
+                mt={3}
+                isRequired
+                display="flex"
+                alignItems="center"
+              >
+                <Input
+                  variant="filled"
+                  bg="#E0E0E0"
+                  value={aiTipPrompt}
+                  onChange={handleAiTipPromptChange}
+                  flex="1" // Make input take remaining width
+                  mr={2} // Add some margin between the input and button
+                />
+                <Button type="submit" mt={0} colorScheme="blue">
+                  Tip
                 </Button>
               </FormControl>
             </form>
