@@ -20,7 +20,7 @@ import animationData from "../animations/typing.json";
 
 import io from "socket.io-client";
 import { ChatState } from "../Context/ChatProvider";
-const ENDPOINT = "http://localhost:8080"; // "https://talk-a-tive.herokuapp.com"; -> After deployment
+const ENDPOINT = "https://pro-demo-chatapp.onrender.com"; // "https://talk-a-tive.herokuapp.com"; -> After deployment
 var socket, selectedChatCompare;
 
 const SingleChat = ({ fetchAgain, setFetchAgain }) => {
